@@ -6,6 +6,7 @@ use App\Mail\VerificationCodeMail;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 
 class AdminController extends Controller
@@ -116,9 +117,31 @@ class AdminController extends Controller
         }
     }
 
-public function PasswordUpdate(Request $request){
-    
-}
+    public function PasswordUpdate(Request $request)
+    {
 
+        $user = Auth::user();
+        $request->validate([
+            'old_password' => 'required',
+            'new_password' => 'required|confirmed',
+        ]);
+        if (! Hash::check($request->old_password, $user->password)) {
+            $notification = [
+                'message' => 'old password does not match',
+                'alert-type' => 'error',
+            ];
 
+            return back()->with($notification);
+        }
+        User::whereId($user->id)->update([
+            'password' => Hash::make($request->new_password),
+        ]);
+        Auth::logout();
+        $notification = [
+            'message' => 'Password Updated Successfully',
+            'alert-type' => 'success',
+        ];
+
+        return redirect()->route('login')->with($notification);
+    }
 }
