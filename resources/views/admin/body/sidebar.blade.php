@@ -126,7 +126,7 @@
                                             <a href="pages-starter.html" class="tp-link">Starter</a>
                                         </li>
                                         <li>
-                                            <a href="pages-profile.html" class="tp-link">Profile</a>
+                                            <a href="{{ route('admin.profile') }}" class="tp-link">Profile</a>
                                         </li>
                                         <li>
                                             <a href="pages-pricing.html" class="tp-link">Pricing</a>

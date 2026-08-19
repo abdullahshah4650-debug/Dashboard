@@ -1,6 +1,6 @@
 @extends('admin.admin_master')
 @section('admin')
-
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 
 <div class="content">
 <div class="container-xxl">
@@ -20,7 +20,7 @@
 
             <div class="align-items-center">
                 <div class="d-flex align-items-center">
-                    <img src="{{ (!empty($profileData->photo)) ? url ('upload/user_images'.$profileData->photo) : url('upload/no_image.jpg') }}" class="rounded-circle avatar-xxl img-thumbnail float-start" alt="image profile">
+                    <img src="{{ (!empty($profileData->photo)) ? url ('upload/user_images/'.$profileData->photo) : url('upload/no_image.jpg') }}" class="rounded-circle avatar-xxl img-thumbnail float-start" alt="image profile">
 
                     <div class="overflow-hidden ms-4">
                         <h4 class="m-0 text-dark fs-20">{{ $profileData->name }}</h4>
@@ -44,6 +44,8 @@
                             </div><!--end col-->                                                       
                         </div>
                     </div>
+<form method="post" enctype="multipart/form-data" action="{{ route('profile.store') }}">
+    @csrf
 
 <div class="card-body">
 <div class="form-group mb-3 row">
@@ -53,13 +55,47 @@
     </div>
 </div>
 
+<div class="form-group mb-3 row">
+    <label class="form-label">Email</label>
+    <div class="col-lg-12 col-xl-12">
+        <input class="form-control" name="email" type="email" {{ $profileData->email }}">
+    </div>
+</div>
+<div class="form-group mb-3 row">
+    <label class="form-label">Phone</label>
+    <div class="col-lg-12 col-xl-12">
+        <input class="form-control" name="phone" type="text" {{ $profileData->email }}">
+    </div>
+</div>
+<div class="form-group mb-3 row">
+    <label class="form-label">Address</label>
+    <div class="col-lg-12 col-xl-12">
+<textarea name="address" class="form-control">
+    {{ $profileData->address }}
+</textarea>
+    </div>
+</div>
 
+<div class="form-group mb-3 row">
+    <label class="form-label">Profile Photo</label>
+    <div class="col-lg-12 col-xl-12">
+        <input id="image" class="form-control" name="photo" type="file">
+    </div>
+</div>
+<div class="form-group mb-3 row">
+    <label class="form-label"></label>
+    <div class="col-lg-12 col-xl-12">
+<img id="showimage" src="{{ (!empty($profileData->photo)) ? url ('upload/user_images/'.$profileData->photo) : url('upload/no_image.jpg') }}" class="rounded-circle avatar-xxl img-thumbnail float-start" alt="image profile">
+    </div>
+</div>
 
+<button type="submit" class="btn btn-primary">Save Changes</button>
 
 
 </div><!--end card-body-->
-                </div>
-            </div>
+</form>
+    </div>
+    </div>
 
             <div class="col-lg-6 col-xl-6">
                 <div class="card border mb-0">
@@ -72,34 +108,47 @@
                         </div>
                     </div>
 
-                    <div class="card-body mb-0">
-                        <div class="form-group mb-3 row">
-                            <label class="form-label">Old Password</label>
-                            <div class="col-lg-12 col-xl-12">
-                                <input class="form-control" type="password" placeholder="Old Password">
-                            </div>
-                        </div>
-                        <div class="form-group mb-3 row">
-                            <label class="form-label">New Password</label>
-                            <div class="col-lg-12 col-xl-12">
-                                <input class="form-control" type="password" placeholder="New Password">
-                            </div>
-                        </div>
-                        <div class="form-group mb-3 row">
-                            <label class="form-label">Confirm Password</label>
-                            <div class="col-lg-12 col-xl-12">
-                                <input class="form-control" type="password" placeholder="Confirm Password">
-                            </div>
-                        </div>
+<form action="{{ route('admin.password.update') }}" method="post">
+@csrf
 
-                        <div class="form-group row">
-                            <div class="col-lg-12 col-xl-12">
-                                <button type="submit" class="btn btn-primary">Change Password</button>
-                                <button type="button" class="btn btn-danger">Cancel</button>
-                            </div>
-                        </div>
+<div class="card-body mb-0">
+    <div class="form-group mb-3 row">
+        <label class="form-label">Old Password</label>
+        <div class="col-lg-12 col-xl-12">
+            <input class="form-control @error('old_password') is-invalid @enderror" type="password" name="old_password" id="old_password" placeholder="Old Password">
+            @error('old_password')
+                <span class="text-danger">{{ $message }}</span>
+            @enderror
+        </div>
+    </div>
+   <div class="form-group mb-3 row">
+        <label class="form-label">New Password</label>
+        <div class="col-lg-12 col-xl-12">
+            <input class="form-control @error('new_password') is-invalid @enderror" type="password" name="new_password" id="new_password" placeholder="New Password">
+            @error('new_password')
+                <span class="text-danger">{{ $message }}</span>
+            @enderror
+        </div>
+    </div>
+    <div class="form-group mb-3 row">
+        <label class="form-label">Confirm Password</label>
+        <div class="col-lg-12 col-xl-12">
+            <input class="form-control" type="password" name="new_password_confirmation" id="new_password_confirmation" placeholder="Confirm Password">
+        </div>
+    </div>
 
-                    </div><!--end card-body-->
+    <div class="form-group row">
+        <div class="col-lg-12 col-xl-12">
+            <button type="submit" class="btn btn-primary">Change Password</button>
+        </div>
+    </div>
+
+</div><!--end card-body-->
+</form>
+
+
+
+
                 </div>
             </div>
 
@@ -120,5 +169,21 @@
 </div>
 </div>
 
+
+
+
+<script type="text/javascript">
+$(document).ready(function() {
+    $('#image').change(function(e) {
+        var reader = new FileReader();
+
+        reader.onload = function(e) {
+            $('#showimage').attr('src', e.target.result);
+        }
+
+        reader.readAsDataURL(e.target.files[0]);
+    });
+});
+</script>
 
 @endsection
